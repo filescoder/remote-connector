@@ -123,7 +123,56 @@ class RemoteConnector
 
     public function getErrorMessage()
     {
-        return $this->error;
+        if (is_null($this->error)) {
+            $this->setErrorMessage();
+        } else {
+            return $this->error;
+        }
+    }
+
+    protected function setErrorMessage()
+    {
+        if ($this->status == 200 && $this->remoteFile) {
+            $this->error = '';
+        } else {
+            switch ($this->status) {
+                case 200:
+                case 204:
+                    $this->error = "Connection OK, but file is empty";
+                    break;
+                case 301:
+                case 302:
+                case 303:
+                case 307:
+                case 410:
+                    $this->error = "File has been moved or does not exist";
+                    break;
+                case 305:
+                    $this->error = "File must be accessed through a proxy";
+                    break;
+                case 400:
+                    $this->error = "Malformed request";
+                    break;
+                case 404:
+                    $this->error = "Fle not found";
+                    break;
+                case 407:
+                    $this->error = "Proxy requires authentication";
+                    break;
+                case 408:
+                    $this->error = "Reuqest timed out";
+                    break;
+                case 500:
+                    $this->error = "The remote server encountered an internal error";
+                    break;
+                case 503:
+                    $this->error = "The server cannot handle the request at the moment";
+                    break;
+                default:
+                    $this->error = "Undefined error. Check URL and domain name";
+                    break;
+            }
+        }
     }
     
 }
