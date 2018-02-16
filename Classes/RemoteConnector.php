@@ -41,15 +41,29 @@ class RemoteConnector
     {
         $this->remoteFile = @ file_get_contents($this->url);
         $headers = @get_headers($this->url);
-        if ($headers) {
-            preg_match('/\d{3}/', $headers[0], $m);
-            echo $m[0];
-        }
     }
 
     protected function useCurl()
     {
-        echo 'cURL is enabled';
+        if ($session = curl_init($this->url)) {
+            // Suppress the HTTP headers
+            curl_setopt($session, CURLOPT_HEADER, false);
+
+            // Return the remote file as a string
+            // rather than output it directly
+            curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
+
+            // Get the remote file and store it in the $remoteFile property
+            $this->remoteFile = curl_exec($session);
+
+            // Get the HTTP status
+            $this->status = curl_getinfo($session, CURLINFO_HTTP_CODE);
+
+            // Close the cURL session
+            curl_close($session);        
+        } else {
+            $this->error = 'Cannot establish cURL session';
+        }
     }
 
     protected function useSocket()
