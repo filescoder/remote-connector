@@ -62,7 +62,6 @@ class Autoloader
         $fileName = str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';
         foreach (self::$dirs as $start) {
             $file = $base_dir . $start . DIRECTORY_SEPARATOR . $fileName;
-            echo $file . '<br>';
             if (self::loadFile($file)) {
                 self::$success = true;
                 break;
@@ -93,4 +92,4 @@ class Autoloader
 
 }
 
-$loader = new Autoloader(array('Pos'));
+$loader = new Autoloader(array('Classes'));
