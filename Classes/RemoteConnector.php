@@ -20,6 +20,13 @@ class RemoteConnector
         }
     }
 
+    public function __toString()
+    {
+        if (!$this->remoteFile)
+            $this->remoteFile = '';
+        return $this->remoteFile;
+    }
+
     protected function checkURL()
     {
         $flags = FILTER_FLAG_SCHEME_REQUIRED | FILTER_FLAG_HOST_REQUIRED;
@@ -32,7 +39,12 @@ class RemoteConnector
 
     protected function accessDirect()
     {
-        echo 'allow_url_fopen is enabled';
+        $this->remoteFile = @ file_get_contents($this->url);
+        $headers = @get_headers($this->url);
+        if ($headers) {
+            preg_match('/\d{3}/', $headers[0], $m);
+            echo $m[0];
+        }
     }
 
     protected function useCurl()
